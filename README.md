@@ -12,7 +12,10 @@
 <strong>Asignatura:</strong> Seguridad de Redes<br>
 <strong>Docente:</strong> Jonathan Esteban Rondon Corniel<br>
 <strong>Fecha de Entrega:</strong> 2 de julio de 2026<br>
-<strong>Video de Exposición:</strong> <a href="https://youtu.be/g-DizA9DKnY">https://youtu.be/g-DizA9DKnY</a>
+<strong>Video de Exposición:</strong> <a href="https://youtu.be/g-DizA9DKnY">https://youtu.be/g-DizA9DKnY</a><br>
+<strong>Repositorio de GitHub:</strong> <a href="https://github.com/imAlanG16/02_ipsec_ikev1_route_s2s">https://github.com/imAlanG16/02_ipsec_ikev1_route_s2s</a>
+</div>
+</div>
 
 ## Objetivo de la VPN
 El propósito de esta configuración es implementar un enlace VPN Site-to-Site basado en enrutamiento (Route-based) utilizando interfaces lógicas de túnel virtual (Virtual Tunnel Interfaces - VTI) aseguradas con IPSec IKEv1. A diferencia de las VPNs basadas en políticas, este modelo crea interfaces lógicas virtuales directas (`Tunnel0`) donde todo el tráfico enrutado hacia la interfaz es automáticamente encriptado. Esto permite simplificar la administración del enrutamiento al desacoplar la seguridad (IPSec) de las tablas de rutas y habilitar el soporte para tráfico de broadcast, multicast y protocolos de enrutamiento dinámico sobre el enlace seguro.
@@ -23,6 +26,7 @@ La topología física de tránsito es equivalente al diseño Site-to-Site anteri
 <div style="text-align: center; margin: 10px 0;">
   <img src="images/topologia_s2s.png" width="400" alt="Topología de Red Site-to-Site GNS3">
   <p style="font-size: 0.95em; color: #666; font-style: italic;">Topología física Site-to-Site utilizada en la práctica</p>
+</div>
 
 El direccionamiento configurado para las interfaces de red físicas y virtuales es el siguiente:
 
@@ -39,7 +43,7 @@ El direccionamiento configurado para las interfaces de red físicas y virtuales 
 
 
 
-<div style="page-break-after: always; break-after: page; display: block; height: 1px; overflow: hidden;">
+<div style="page-break-after: always; break-after: page; display: block; height: 1px; overflow: hidden;"></div>
 
 ## Parámetros Criptográficos Utilizados
 Los parámetros de seguridad empleados en las fases ISAKMP e IPSec son:
@@ -61,7 +65,7 @@ En este diseño, ya no se utiliza una lista de acceso para interceptar las redes
 Los scripts de configuración se encuentran guardados en la carpeta de recursos de este entregable: [script_configuracion.txt](resources/script_configuracion.txt).
 
 
-<div style="page-break-after: always; break-after: page; display: block; height: 1px; overflow: hidden;">
+<div style="page-break-after: always; break-after: page; display: block; height: 1px; overflow: hidden;"></div>
 
 ## Verificación de Funcionamiento
 
@@ -73,6 +77,9 @@ Se observa el direccionamiento virtual configurado **`10.0.0.1/30`**, la definic
 <div style="text-align: center; margin: 10px 0;">
   <img src="images/interface_tunnel.png" width="400" alt="Estado de la interfaz Tunnel0 en el router OESTE">
   <p style="font-size: 0.9em; color: #666; font-style: italic;">Detalles de la interfaz virtual Tunnel0 en OESTE mostrando la protección IPSec activa</p>
+</div>
+
+</div>
 
 ### 2. Estado de la Negociación ISAKMP SA (Fase 1)
 La comprobación de la Fase 1 se realiza mediante el comando `show crypto isakmp sa` en el router `OESTE`. La salida registra las asociaciones activas establecidas bidireccionalmente hacia el peer público remoto `2.2.2.2`. 
@@ -82,6 +89,9 @@ Ambas asociaciones se reportan en el estado estable **`QM_IDLE`** y estatus **`A
 <div style="text-align: center; margin: 10px 0;">
   <img src="images/crypto_isakmp_sa.png" width="400" alt="Asociación de seguridad ISAKMP activa en OESTE">
   <p style="font-size: 0.9em; color: #666; font-style: italic;">Estado ISAKMP SA en el router OESTE confirmando la conectividad de Fase 1 activa</p>
+</div>
+
+</div>
 
 ### 3. Asociación de Seguridad IPSec en la Interfaz de Túnel (Fase 2)
 Al ejecutar el comando `show crypto ipsec sa` en el router `OESTE`, se verifica el estado criptográfico de la interfaz Tunnel0. Cabe destacar que, al tratarse de una VPN basada en enrutamiento con VTI, las identidades de red protegidas (`local ident` y `remote ident`) se definen de manera global como **`(0.0.0.0/0.0.0.0/0/0)`** hacia cualquier puerto y protocolo. Esto significa que todo tráfico inyectado hacia la interfaz virtual es cifrado automáticamente por el perfil sin depender de una ACL de control estática.
@@ -95,6 +105,9 @@ Esto valida que 20 tramas de datos han sido cifradas y descifradas de extremo a 
 <div style="text-align: center; margin: 10px 0;">
   <img src="images/crypto_ipsec_sa.png" width="400" alt="Detalles de show crypto ipsec sa para Tunnel0">
   <p style="font-size: 0.9em; color: #666; font-style: italic;">Estadísticas de la SA IPSec de Tunnel0 en OESTE mostrando la delegación total del tráfico en el túnel</p>
+</div>
+
+</div>
 
 ### 4. Prueba de Conectividad y Enrutamiento LAN a LAN (Traceroute VTI)
 La verificación de tráfico de extremo a extremo se realiza desde el host VPCS corporativo en el extremo Oeste. Al enviar tráfico hacia la IP del host en la LAN remota Este (`14.3.20.11`), se obtiene una conectividad exitosa con **0% de pérdida**.
@@ -107,3 +120,5 @@ Además, al trazar la ruta mediante el comando `tracer 14.3.20.11`, se documenta
 <div style="text-align: center; margin: 10px 0;">
   <img src="images/ping_lan_a_lan.png" width="400" alt="Ping y traceroute exitosos mediante túnel VTI">
   <p style="font-size: 0.9em; color: #666; font-style: italic;">Prueba de conectividad desde VPCS validando el paso explícito por la IP del túnel virtual 10.0.0.2</p>
+</div>
+</div>
